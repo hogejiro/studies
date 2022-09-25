@@ -49,12 +49,12 @@ char editorReadKey() {
 /*** input ***/
 void editorProcessKeyPress() {
     char c = editorReadKey();
-    if (iscntrl(c)) {
-        printf("%d\r\n", c);
-    } else {
-        printf("%d ('%c')\r\n", c, c);
+
+    switch (c) {
+        case CTRL_KEY('q'):
+            exit(0);
+            break;
     }
-    if (c == CTRL_KEY('q')) exit(1);
 }
 
 /*** init ***/
