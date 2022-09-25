@@ -1,13 +1,18 @@
+/*** includes ***/
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
+
+/*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
 
+/*** data ***/
 struct termios orig_termios;
 
+/*** terminal ***/
 void die(const char *s) {
     perror(s);
     exit(1);
@@ -32,9 +37,18 @@ void enableRawMode() {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
 
+char editorReadKey() {
+    int nread;
+    char c;
+    while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
+        if (nread == -1 && errno != EAGAIN) die("read");
+    }
+    return c;
+}
+
+/*** input ***/
 void editorProcessKeyPress() {
-    char c = '\0';
-    if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
+    char c = editorReadKey();
     if (iscntrl(c)) {
         printf("%d\r\n", c);
     } else {
@@ -43,6 +57,7 @@ void editorProcessKeyPress() {
     if (c == CTRL_KEY('q')) exit(1);
 }
 
+/*** init ***/
 int main() {
     enableRawMode();
     while (1) {
