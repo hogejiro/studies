@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 /*** defines ***/
+#define KILO_VERSION "0.0.1"
 #define CTRL_KEY(k) ((k)&0x1f)
 
 /*** data ***/
@@ -93,7 +94,8 @@ struct abuf {
     int len;
 };
 
-#define ABUF_INIT {NULL, 0}
+#define ABUF_INIT \
+    { NULL, 0 }
 
 void abAppend(struct abuf *ab, const char *s, int len) {
     char *new = realloc(ab->b, ab->len + len);
@@ -104,15 +106,27 @@ void abAppend(struct abuf *ab, const char *s, int len) {
     ab->len += len;
 }
 
-void abFree(struct abuf *ab) {
-    free(ab->b);
-}
+void abFree(struct abuf *ab) { free(ab->b); }
 
 /*** output ***/
 void editorDrawRows(struct abuf *ab) {
     int y;
     for (y = 0; y < E.screenrows; y++) {
-        abAppend(ab, "~", 1);
+        if (y == E.screenrows / 3) {
+            char welcome[80];
+            int welcomelen = snprintf(welcome, sizeof(welcome),
+                "kilo editor -- version %s", KILO_VERSION);
+            if (welcomelen > E.screencols) welcomelen = E.screencols;
+            int padding = (E.screencols - welcomelen) / 2;
+            if (padding) {
+                abAppend(ab, "~", 1);
+                padding--;
+            }
+            while (padding--) abAppend(ab, " ", 1);
+            abAppend(ab, welcome, welcomelen);
+        } else {
+            abAppend(ab, "~", 1);
+        }
 
         abAppend(ab, "\x1b[K", 3);
         if (y < E.screenrows - 1) {
