@@ -295,8 +295,11 @@ void editorMoveCursor(int key) {
     erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
     switch (key) {
         case ARROW_LEFT:
-            if (E.cx != 0) {
+            if (E.cx > 0) {
                 E.cx--;
+            } else {
+                E.cy--;
+                E.cx = E.row[E.cy].size;
             }
             break;
         case ARROW_RIGHT:
