@@ -261,6 +261,26 @@ void abAppend(struct abuf *ab, const char *s, int len) {
 void abFree(struct abuf *ab) { free(ab->b); }
 
 /*** output ***/
+void editorScroll() {
+    E.rx = 0;
+    if (E.cy < E.numrows) {
+        E.rx = editorRowCxToRx(&E.row[E.cy], E.cx);
+    }
+
+    if (E.cy < E.rowoffset) {
+        E.rowoffset = E.cy;
+    }
+    if (E.cy >= E.screenrows + E.rowoffset) {
+        E.rowoffset = E.cy - E.screenrows + 1;
+    }
+    if (E.rx < E.coloffset) {
+        E.coloffset = E.rx;
+    }
+    if (E.rx >= E.screencols + E.coloffset) {
+        E.coloffset = E.rx - E.screencols + 1;
+    }
+}
+
 void editorDrawRows(struct abuf *ab) {
     int y;
     for (y = 0; y < E.screenrows; y++) {
@@ -293,26 +313,6 @@ void editorDrawRows(struct abuf *ab) {
         if (y < E.screenrows - 1) {
             abAppend(ab, "\r\n", 2);
         }
-    }
-}
-
-void editorScroll() {
-    E.rx = 0;
-    if (E.cy < E.numrows) {
-        E.rx = editorRowCxToRx(&E.row[E.cy], E.cx);
-    }
-
-    if (E.cy < E.rowoffset) {
-        E.rowoffset = E.cy;
-    }
-    if (E.cy >= E.screenrows + E.rowoffset) {
-        E.rowoffset = E.cy - E.screenrows + 1;
-    }
-    if (E.rx < E.coloffset) {
-        E.coloffset = E.rx;
-    }
-    if (E.rx >= E.screencols + E.coloffset) {
-        E.coloffset = E.rx - E.screencols + 1;
     }
 }
 
